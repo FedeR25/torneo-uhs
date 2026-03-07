@@ -1,4 +1,4 @@
-const { getDb, guardarDb } = require("./database")
+const { pool } = require("./database"); //
 
 const fixture = [
   { fecha: 1, home: "Magos", away: "Caranchos", gh: 1, ga: 1 },
@@ -61,19 +61,29 @@ const fixture = [
   { fecha: 20, home: "Magos", away: "Kaiser", gh: null, ga: null },
   { fecha: 20, home: "Caranchos", away: "Golosos", gh: null, ga: null },
   { fecha: 20, home: "Dealers", away: "Aston Birra", gh: null, ga: null },
-]
+];
 
 async function cargar() {
-  const db = await getDb()
-  db.run("DELETE FROM partidos")
-  fixture.forEach(p => {
-    db.run(
-      `INSERT INTO partidos (fecha, equipo_home, equipo_away, goles_home, goles_away) VALUES (?, ?, ?, ?, ?)`,
-      [p.fecha, p.home, p.away, p.gh, p.ga]
-    )
-  })
-  guardarDb()
-  console.log(`✅ ${fixture.length} partidos cargados`)
+  console.log("Iniciando conexión con Postgres...");
+  try {
+    // Primero limpiamos la tabla por si ya tenía basura
+    await pool.query("DELETE FROM partidos");
+    
+    // Insertamos uno por uno
+    for (const p of fixture) {
+      await pool.query(
+        `INSERT INTO partidos (fecha, equipo_home, equipo_away, goles_home, goles_away) 
+         VALUES ($1, $2, $3, $4, $5)`,
+        [p.fecha, p.home, p.away, p.gh, p.ga]
+      );
+    }
+    console.log(`✅ ${fixture.length} partidos cargados exitosamente en la nube`);
+  } catch (err) {
+    console.error("Error cargando los datos:", err);
+  } finally {
+    // Cerramos la conexión para que no se quede colgada la terminal
+    process.exit();
+  }
 }
 
-cargar()
+cargar();

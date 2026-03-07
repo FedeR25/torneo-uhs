@@ -1,44 +1,32 @@
-const path = require("path")
-const fs = require("fs")
-const initSqlJs = require("sql.js")
+const { Pool } = require('pg');
 
-const DB_PATH = path.join(__dirname, "torneo.db")
+// Usamos la variable de entorno que configuramos
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
-let db
-
-async function getDb() {
-  if (db) return db
-  const SQL = await initSqlJs()
-  
-  if (fs.existsSync(DB_PATH)) {
-    const fileBuffer = fs.readFileSync(DB_PATH)
-    db = new SQL.Database(fileBuffer)
-  } else {
-    db = new SQL.Database()
-    db.run(`
-      CREATE TABLE IF NOT EXISTS equipos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL
-      )
-    `)
-    db.run(`
+async function inicializarTablas() {
+  const client = await pool.connect();
+  try {
+    await client.query(`
       CREATE TABLE IF NOT EXISTS partidos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         fecha INTEGER NOT NULL,
         equipo_home TEXT NOT NULL,
         equipo_away TEXT NOT NULL,
         goles_home INTEGER,
         goles_away INTEGER
-      )
-    `)
-    guardarDb()
+      );
+    `);
+    console.log("Tablas de Postgres listas ✅");
+  } catch (err) {
+    console.error("Error inicializando tablas:", err);
+  } finally {
+    client.release();
   }
-  return db
 }
 
-function guardarDb() {
-  const data = db.export()
-  fs.writeFileSync(DB_PATH, Buffer.from(data))
-}
-
-module.exports = { getDb, guardarDb }
+module.exports = { pool, inicializarTablas };
