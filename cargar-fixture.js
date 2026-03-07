@@ -1,4 +1,4 @@
-const { pool } = require("./database"); //
+const { pool } = require("./database");
 
 const fixture = [
   { fecha: 1, home: "Magos", away: "Caranchos", gh: 1, ga: 1 },
@@ -64,12 +64,24 @@ const fixture = [
 ];
 
 async function cargar() {
-  console.log("Iniciando conexión con Postgres...");
+  console.log("Iniciando conexión con Postgres y creando tabla...");
   try {
-    // Primero limpiamos la tabla por si ya tenía basura
+    // Creamos la tabla por si todavía no existe en la nube
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS partidos (
+        id SERIAL PRIMARY KEY,
+        fecha INTEGER NOT NULL,
+        equipo_home TEXT NOT NULL,
+        equipo_away TEXT NOT NULL,
+        goles_home INTEGER,
+        goles_away INTEGER
+      );
+    `);
+    
+    // Limpiamos la tabla
     await pool.query("DELETE FROM partidos");
     
-    // Insertamos uno por uno
+    // Insertamos los partidos
     for (const p of fixture) {
       await pool.query(
         `INSERT INTO partidos (fecha, equipo_home, equipo_away, goles_home, goles_away) 
@@ -81,7 +93,6 @@ async function cargar() {
   } catch (err) {
     console.error("Error cargando los datos:", err);
   } finally {
-    // Cerramos la conexión para que no se quede colgada la terminal
     process.exit();
   }
 }

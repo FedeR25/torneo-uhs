@@ -22,11 +22,8 @@ async function inicializarTablas() {
       );
     `);
     console.log("Tablas de Postgres listas ✅");
-  } catch (err) {
-    console.error("Error inicializando tablas:", err);
   } finally {
     client.release();
   }
 }
-
 module.exports = { pool, inicializarTablas };
