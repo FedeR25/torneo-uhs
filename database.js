@@ -1,10 +1,10 @@
 const { Pool } = require('pg');
 
+// Render llena process.env.DATABASE_URL automáticamente con la Internal URL que pegaste
 const pool = new Pool({
-  // Esta línea es la que está fallando, asegurate de que esté así:
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false
+    rejectUnauthorized: false // Esto es necesario para que Render acepte la conexión segura
   }
 });
 
@@ -21,9 +21,12 @@ async function inicializarTablas() {
         goles_away INTEGER
       );
     `);
-    console.log("Tablas de Postgres listas ✅");
+    console.log("Estructura de base de datos verificada ✅");
+  } catch (err) {
+    console.error("Error al inicializar tablas:", err);
   } finally {
     client.release();
   }
 }
+
 module.exports = { pool, inicializarTablas };
