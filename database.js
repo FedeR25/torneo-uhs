@@ -1,7 +1,7 @@
 const { Pool } = require('pg');
 
-// Usamos la variable de entorno que configuramos
 const pool = new Pool({
+  // Esta línea es la que está fallando, asegurate de que esté así:
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false
