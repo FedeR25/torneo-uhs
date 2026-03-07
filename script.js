@@ -112,4 +112,16 @@ async function guardarResultado() {
         }
     } catch (error) {
         console.error("Error en fetch:", error);
-        alert("❌ Error de conexión
+        alert("❌ Error de conexión con el servidor.");
+    }
+}
+
+// 5. Pestañas
+function showTab(tabId) {
+    document.querySelectorAll('.seccion').forEach(s => s.style.display = 'none');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(tabId).style.display = 'block';
+    document.getElementById('tab-' + tabId).classList.add('active');
+}
+
+init();
