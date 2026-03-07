@@ -48,11 +48,13 @@ app.post("/resultado", async (req, res) => {
 
   try {
     await pool.query(
-      `UPDATE partidos 
-       SET goles_home = $1, goles_away = $2 
-       WHERE fecha = $3 AND equipo_home = $4 AND equipo_away = $5`,
-      [goles_home, goles_away, fecha, equipo_home, equipo_away]
-    );
+  `UPDATE partidos 
+   SET goles_home = $1, goles_away = $2 
+   WHERE fecha = $3 
+   AND LOWER(equipo_home) = LOWER($4) 
+   AND LOWER(equipo_away) = LOWER($5)`,
+  [goles_home, goles_away, fecha, equipo_home, equipo_away]
+);
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
