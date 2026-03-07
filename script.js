@@ -81,32 +81,30 @@ function cerrarModal() {
   document.getElementById("modal").style.display = "none"
 }
 
-// Buscá la función que se encarga de guardar y dejala así:
-async function guardarGoles(fecha, equipo_home, equipo_away, goles_home, goles_away) {
-    // 1. Pedir la clave al usuario
-    const password = prompt("Ingresá la Clave de Capitán para confirmar:");
-    if (!password) return; // Si cancela, no hace nada
+async function guardarResultado(fecha, home, away, gh, ga) {
+  // ESTO ES LO QUE TE FALTA: El cartelito
+  const pass = prompt("Ingresá la Clave de Capitán:");
+  if (!pass) return; 
 
-    const response = await fetch("/resultado", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            fecha,
-            equipo_home,
-            equipo_away,
-            goles_home,
-            goles_away,
-            password // <--- Esto es lo que Render está esperando ahora
-        })
-    });
+  const res = await fetch("/resultado", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fecha,
+      equipo_home: home,
+      equipo_away: away,
+      goles_home: gh,
+      goles_away: ga,
+      password: pass // <--- La llave que abre el servidor
+    })
+  });
 
-    if (response.ok) {
-        alert("✅ ¡Resultado guardado!");
-        location.reload();
-    } else {
-        const errorData = await response.json();
-        alert("❌ Error: " + errorData.error);
-    }
+  if (res.ok) {
+    alert("✅ ¡Gol guardado!");
+    location.reload();
+  } else {
+    alert("❌ Error: Clave incorrecta o problema de conexión.");
+  }
 }
 
 function showTab(nombre) {
