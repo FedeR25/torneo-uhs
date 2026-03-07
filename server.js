@@ -39,7 +39,13 @@ app.get("/partidos", async (req, res) => {
 });
 
 app.post("/resultado", async (req, res) => {
-  const { fecha, equipo_home, equipo_away, goles_home, goles_away } = req.body;
+  const { fecha, equipo_home, equipo_away, goles_home, goles_away, password } = req.body;
+
+  // ESTA ES LA SEGURIDAD: Compara la clave que llega con la de Render
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: "Clave incorrecta. No tenés permiso para cargar goles." });
+  }
+
   try {
     await pool.query(
       `UPDATE partidos 
@@ -49,8 +55,8 @@ app.post("/resultado", async (req, res) => {
     );
     res.json({ ok: true });
   } catch (err) {
-    console.error("Error al guardar resultado:", err);
-    res.status(500).json({ error: "No se pudo guardar el resultado" });
+    console.error(err);
+    res.status(500).json({ error: "Error en la base de datos" });
   }
 });
 
