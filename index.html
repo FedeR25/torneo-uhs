@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>El GRAN Torneo de Fútbol</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <h1>El GRAN Torneo de Fútbol</h1>
+  <p>UHS</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('tabla')">Tabla</button>
+    <button class="tab" onclick="showTab('fixture')">Fixture</button>
+  </div>
+
+  <div id="tabla" class="seccion">
+    <h2>Tabla de Posiciones</h2>
+    <table id="tabla-posiciones">
+      <thead>
+        <tr>
+          <th>#</th><th>Equipo</th><th>PJ</th><th>PG</th>
+          <th>PE</th><th>PP</th><th>GF</th><th>GC</th><th>DG</th><th>PTS</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div id="fixture" class="seccion" style="display:none">
+    <h2>Fixture</h2>
+    <div id="fixture-container"></div>
+  </div>
+
+  <div id="modal">
+    <div class="modal-contenido">
+      <h3 id="modal-titulo"></h3>
+      <div class="modal-inputs">
+        <input id="input-home" type="number" min="0" max="99">
+        <span>-</span>
+        <input id="input-away" type="number" min="0" max="99">
+      </div>
+      <div class="modal-botones">
+        <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn-guardar" onclick="guardarResultado()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-equipo">
+    <div class="modal-equipo-contenido">
+      <h3 id="modal-equipo-titulo"></h3>
+      <div id="modal-equipo-partidos"></div>
+      <button class="btn-cerrar-equipo" onclick="cerrarModalEquipo()">Cerrar</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
