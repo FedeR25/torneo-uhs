@@ -39,16 +39,20 @@ app.get("/partidos", async (req, res) => {
   }
 });
 
-// 3. ACTUALIZAR RESULTADO (Con validación mejorada)
+// 3. ACTUALIZAR RESULTADO (Con Debug de Clave)
 app.post("/resultado", async (req, res) => {
   const { fecha, equipo_home, equipo_away, goles_home, goles_away, password } = req.body;
 
-  if (password !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ error: "Clave incorrecta." });
+  // ESTO ES PARA DEBUGEAR EN RENDER LOGS
+  console.log("--- Intento de carga ---");
+  console.log("Recibido:", password);
+  console.log("Esperado (Env):", process.env.ADMIN_PASSWORD);
+
+  if (!password || password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: "Clave incorrecta" });
   }
 
   try {
-    // Usamos parseInt para asegurar que los goles y fecha sean números
     const result = await pool.query(
       `UPDATE partidos 
        SET goles_home = $1, goles_away = $2 
@@ -59,17 +63,17 @@ app.post("/resultado", async (req, res) => {
     );
 
     if (result.rowCount === 0) {
-      return res.status(404).json({ error: "No se encontró el partido exacto." });
+      return res.status(404).json({ error: "No se encontró el partido en la base de datos" });
     }
 
     res.json({ ok: true });
   } catch (err) {
-    console.error("Error en UPDATE:", err);
-    res.status(500).json({ error: "Error al guardar en base de datos" });
+    console.error("Error en DB:", err);
+    res.status(500).json({ error: "Error interno de la base de datos" });
   }
 });
 
-// 4. RUTA DE LA TABLA (Esta es la que te faltaba)
+// 4. RUTA DE LA TABLA (Cálculo automático)
 app.get("/tabla", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM partidos WHERE goles_home IS NOT NULL");
@@ -116,7 +120,7 @@ app.get("/tabla", async (req, res) => {
 
     res.json(tablaOrdenada);
   } catch (err) {
-    console.error("Error en tabla:", err);
+    console.error("Error al generar tabla:", err);
     res.status(500).json({ error: "Error al calcular tabla" });
   }
 });
