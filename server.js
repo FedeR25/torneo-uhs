@@ -125,4 +125,27 @@ app.get("/tabla", async (req, res) => {
   }
 });
 
+app.get("/admin/cargar-jugadores", async (req, res) => {
+  const jugadores = [
+    { equipo: "Aston Birra", nombre: "Fabian Koch" },
+    { equipo: "Aston Birra", nombre: "Paul Saban" },
+    { equipo: "Aston Birra", nombre: "Miguel Gonzalez" },
+    { equipo: "Aston Birra", nombre: "Nicolas Toscano" },
+    { equipo: "Aston Birra", nombre: "Nicolas Rosseti" },
+    { equipo: "Aston Birra", nombre: "Martin Celador" },
+    { equipo: "Aston Birra", nombre: "Federico Ramundo" },
+    { equipo: "Aston Birra", nombre: "Marcelo Koblecosky" },
+    { equipo: "Aston Birra", nombre: "Santiago Ricci" },
+  ]
+  try {
+    await pool.query("DELETE FROM jugadores WHERE equipo = 'Aston Birra'")
+    for (const j of jugadores) {
+      await pool.query("INSERT INTO jugadores (equipo, nombre) VALUES ($1, $2)", [j.equipo, j.nombre])
+    }
+    res.json({ ok: true, mensaje: `${jugadores.length} jugadores cargados` })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 startServer();
