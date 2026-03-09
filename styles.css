@@ -3,7 +3,9 @@ body { background-color: #f5f5f5; font-family: Arial, sans-serif; padding: 20px;
 h1, .subtitle { color: #1A4F9C; text-align: center; margin-bottom: 5px; }
 .subtitle { letter-spacing: 2px; margin-bottom: 25px; }
 
-.tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
+.tabs { display: flex; gap: 8px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 5px; }
+.tabs::-webkit-scrollbar { height: 3px; }
+.tabs::-webkit-scrollbar-thumb { background: #1A4F9C; border-radius: 3px; }
 .tab { background: #fff; color: #1A4F9C; border: 2px solid #1A4F9C; padding: 10px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 .tab.active { background: #1A4F9C; color: #fff; }
 
@@ -51,6 +53,17 @@ th, td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; }
 .score-fila { background: #1A4F9C; color: #fff; border-radius: 5px; padding: 3px 10px; text-align: center; margin: 0 10px; min-width: 50px; font-weight: bold; }
 .btn-cerrar-equipo { width: 100%; margin-top: 15px; padding: 10px; background: #1A4F9C; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
+/* JUGADORES */
+.jugadores-form { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.jugadores-form select, .jugadores-form input { flex: 1; padding: 10px; border: 2px solid #1A4F9C; border-radius: 6px; font-size: 0.9rem; min-width: 150px; }
+.jugadores-form button { padding: 10px 20px; }
+
+.equipo-jugadores { background: #fff; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.equipo-jugadores h3 { color: #1A4F9C; border-left: 4px solid #C0272D; padding-left: 10px; margin-bottom: 10px; }
+.jugador-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+.jugador-item:last-child { border-bottom: none; }
+.btn-eliminar { background: #C0272D; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 0.8rem; }
+
 /* RESPONSIVE MOBILE */
 @media (max-width: 600px) {
   body { padding: 10px; }
@@ -63,4 +76,7 @@ th, td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; }
   .resultado-badge { padding: 4px 8px; margin: 0 8px; min-width: 45px; font-size: 0.85rem; }
   .modal-contenido { width: 90%; }
   .modal-equipo-contenido { width: 90%; }
+  .tab { padding: 8px 12px; font-size: 0.8rem; white-space: nowrap; }
+  .jugadores-form { flex-direction: column; }
+  .jugadores-form select, .jugadores-form input { width: 100%; }
 }
