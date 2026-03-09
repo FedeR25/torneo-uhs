@@ -54,6 +54,31 @@ async function cargarFixture() {
     }
 }
 
+async function cargarGoleadores() {
+    try {
+        const res = await fetch("/goleadores");
+        const data = await res.json();
+        const tbody = document.querySelector("#tabla-goleadores tbody");
+        if (!tbody) return;
+
+        if (data.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='4' style='text-align:center;color:#aaa;padding:20px'>Sin goles registrados todavía</td></tr>";
+            return;
+        }
+
+        tbody.innerHTML = data.map((g, i) => `
+            <tr>
+                <td>${i+1}</td>
+                <td>${g.nombre}</td>
+                <td>${g.equipo}</td>
+                <td><strong>${g.total}</strong></td>
+            </tr>
+        `).join("");
+    } catch (err) {
+        console.error("Error cargando goleadores:", err);
+    }
+}
+
 async function abrirModalEquipo(nombre) {
     try {
         const res = await fetch("/partidos");
@@ -81,12 +106,45 @@ function cerrarModalEquipo() {
     document.getElementById("modal-equipo").classList.remove("abierto");
 }
 
-function abrirModal(p) {
+async function abrirModal(p) {
     partidoSeleccionado = p;
     document.getElementById("modal-titulo").innerText = `${p.equipo_home} vs ${p.equipo_away}`;
     document.getElementById("input-home").value = p.goles_home !== null ? p.goles_home : "";
     document.getElementById("input-away").value = p.goles_away !== null ? p.goles_away : "";
+
+    // Cargar goleadores de cada equipo
+    await cargarGoleadoresModal(p.equipo_home, "goleadores-home")
+    await cargarGoleadoresModal(p.equipo_away, "goleadores-away")
+
     document.getElementById("modal").style.display = "flex";
+}
+
+async function cargarGoleadoresModal(equipo, contenedorId) {
+    const contenedor = document.getElementById(contenedorId)
+    try {
+        const res = await fetch(`/jugadores/${encodeURIComponent(equipo)}`)
+        const jugadores = await res.json()
+
+        if (jugadores.length === 0) {
+            contenedor.innerHTML = `<p style='color:#aaa;font-size:0.8rem;margin:5px 0'>Sin jugadores cargados para ${equipo}</p>`
+            return
+        }
+
+        contenedor.innerHTML = `
+            <div class="goleadores-seccion">
+                <h4>⚽ ${equipo}</h4>
+                ${jugadores.map(j => `
+                    <div class="goleador-fila">
+                        <span>${j.nombre}</span>
+                        <input class="goleador-input" type="number" min="0" value="0" 
+                               id="gol-${j.id}" data-jugador="${j.id}">
+                    </div>
+                `).join("")}
+            </div>
+        `
+    } catch (err) {
+        contenedor.innerHTML = ""
+    }
 }
 
 function cerrarModal() { 
@@ -119,7 +177,25 @@ async function guardarResultado() {
 
         const data = await res.json();
 
-        if (res.ok) { 
+        if (res.ok) {
+            // Guardar goles de jugadores
+            const inputs = document.querySelectorAll(".goleador-input")
+            const goles = []
+            inputs.forEach(input => {
+                const cantidad = parseInt(input.value) || 0
+                if (cantidad > 0) {
+                    goles.push({ jugador_id: parseInt(input.dataset.jugador), cantidad })
+                }
+            })
+
+            if (goles.length > 0) {
+                await fetch("/goles", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ partido_id: partidoSeleccionado.id, goles })
+                })
+            }
+
             alert("✅ ¡Guardado con éxito!"); 
             cerrarModal();
             location.reload(); 
@@ -137,6 +213,7 @@ function showTab(tabId) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById(tabId).style.display = 'block';
     document.getElementById('tab-' + tabId).classList.add('active');
+    if (tabId === 'goleadores') cargarGoleadores();
 }
 
 init();
