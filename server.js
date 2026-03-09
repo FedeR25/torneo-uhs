@@ -246,4 +246,20 @@ app.get("/admin/logs", async (req, res) => {
   }
 })
 
+app.get("/goleadores/:equipo", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT j.nombre, SUM(g.cantidad) as total
+      FROM goles g
+      JOIN jugadores j ON j.id = g.jugador_id
+      WHERE j.equipo = $1
+      GROUP BY j.nombre
+      ORDER BY total DESC
+    `, [req.params.equipo])
+    res.json(result.rows)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 startServer();

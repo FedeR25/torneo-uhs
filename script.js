@@ -81,24 +81,66 @@ async function cargarGoleadores() {
 
 async function abrirModalEquipo(nombre) {
     try {
-        const res = await fetch("/partidos");
-        const partidos = await res.json();
+        const [resPartidos, resGoleadores] = await Promise.all([
+            fetch("/partidos"),
+            fetch(`/goleadores/${encodeURIComponent(nombre)}`)
+        ])
+        const partidos = await resPartidos.json()
+        const goleadores = await resGoleadores.json()
+
         const jugados = partidos.filter(p =>
             (p.equipo_home === nombre || p.equipo_away === nombre) && p.goles_home !== null
-        );
-        document.getElementById("modal-equipo-titulo").textContent = nombre;
-        document.getElementById("modal-equipo-partidos").innerHTML = jugados.length === 0
-            ? "<p style='text-align:center;color:#aaa;padding:15px'>Sin partidos jugados todavía</p>"
-            : jugados.map(p => `
-                <div class="partido-fila">
-                    <span>${p.equipo_home}</span>
-                    <span class="score-fila">${p.goles_home} - ${p.goles_away}</span>
-                    <span>${p.equipo_away}</span>
+        )
+        const proximos = partidos.filter(p =>
+            (p.equipo_home === nombre || p.equipo_away === nombre) && p.goles_home === null
+        )
+
+        document.getElementById("modal-equipo-titulo").textContent = nombre
+
+        document.getElementById("modal-equipo-partidos").innerHTML = `
+            ${goleadores.length > 0 ? `
+                <div class="modal-seccion">
+                    <h4>⚽ Goleadores</h4>
+                    ${goleadores.map(g => `
+                        <div class="partido-fila">
+                            <span>${g.nombre}</span>
+                            <span class="score-fila">${g.total}</span>
+                        </div>
+                    `).join("")}
                 </div>
-            `).join("");
-        document.getElementById("modal-equipo").classList.add("abierto");
+            ` : ""}
+
+            <div class="modal-seccion">
+                <h4>📅 Partidos jugados</h4>
+                ${jugados.length === 0
+                    ? "<p style='text-align:center;color:#aaa;padding:10px'>Sin partidos jugados todavía</p>"
+                    : jugados.map(p => `
+                        <div class="partido-fila">
+                            <span>${p.equipo_home}</span>
+                            <span class="score-fila">${p.goles_home} - ${p.goles_away}</span>
+                            <span>${p.equipo_away}</span>
+                        </div>
+                    `).join("")
+                }
+            </div>
+
+            ${proximos.length > 0 ? `
+                <div class="modal-seccion">
+                    <h4>🗓️ Próximos partidos</h4>
+                    ${proximos.slice(0, 3).map(p => `
+                        <div class="partido-fila">
+                            <span>${p.equipo_home}</span>
+                            <span class="score-fila">F${p.fecha}</span>
+                            <span>${p.equipo_away}</span>
+                        </div>
+                    `).join("")}
+                </div>
+            ` : ""}
+        `
+
+        document.getElementById("modal-equipo").classList.add("abierto")
     } catch (err) {
-        console.error("Error cargando partidos del equipo:", err);
+        console.error("Error cargando estadísticas del equipo:", err)
     }
 }
 

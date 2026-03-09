@@ -54,6 +54,10 @@ th, td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; }
 .score-fila { background: #1A4F9C; color: #fff; border-radius: 5px; padding: 3px 10px; text-align: center; margin: 0 10px; min-width: 50px; font-weight: bold; }
 .btn-cerrar-equipo { width: 100%; margin-top: 15px; padding: 10px; background: #1A4F9C; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
+/* MODAL EQUIPO SECCIONES */
+.modal-seccion { margin-bottom: 15px; }
+.modal-seccion h4 { color: #1A4F9C; font-size: 0.85rem; margin-bottom: 8px; border-left: 3px solid #C0272D; padding-left: 8px; }
+
 /* JUGADORES */
 .jugadores-form { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; max-width: 600px; }
 .jugadores-form select, .jugadores-form input { flex: 1; padding: 10px; border: 2px solid #1A4F9C; border-radius: 6px; font-size: 0.9rem; min-width: 150px; }
