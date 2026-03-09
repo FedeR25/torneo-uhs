@@ -59,7 +59,7 @@ app.post("/resultado", async (req, res) => {
        WHERE fecha = $3 
        AND LOWER(TRIM(equipo_home)) = LOWER(TRIM($4)) 
        AND LOWER(TRIM(equipo_away)) = LOWER(TRIM($5))`,
-      [parseInt(goles_home), parseInt(goles_away), parseInt(fecha), equipo_home, equipo_away]
+      [goles_home, goles_away, parseInt(fecha), equipo_home, equipo_away]
     );
 
     if (result.rowCount === 0) {
