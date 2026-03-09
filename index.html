@@ -13,6 +13,7 @@
   <div class="tabs">
     <button id="tab-tabla" class="tab active" onclick="showTab('tabla')">Tabla</button>
     <button id="tab-fixture" class="tab" onclick="showTab('fixture')">Fixture</button>
+    <button id="tab-goleadores" class="tab" onclick="showTab('goleadores')">Goleadores</button>
   </div>
 
   <div id="tabla" class="seccion">
@@ -34,6 +35,20 @@
     <div id="fixture-container"></div>
   </div>
 
+  <div id="goleadores" class="seccion" style="display:none">
+    <h2>Tabla de Goleadores</h2>
+    <div class="table-container">
+      <table id="tabla-goleadores">
+        <thead>
+          <tr>
+            <th>#</th><th>Jugador</th><th>Equipo</th><th>Goles</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
   <div id="modal" class="modal-overlay" style="display:none">
     <div class="modal-contenido">
       <h3 id="modal-titulo"></h3>
@@ -42,6 +57,8 @@
         <span>-</span>
         <input id="input-away" type="number" min="0">
       </div>
+      <div id="goleadores-home" class="goleadores-seccion"></div>
+      <div id="goleadores-away" class="goleadores-seccion"></div>
       <div class="modal-botones">
         <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
         <button class="btn-guardar" onclick="guardarResultado()">Guardar</button>

@@ -112,11 +112,12 @@ async function abrirModal(p) {
     document.getElementById("input-home").value = p.goles_home !== null ? p.goles_home : "";
     document.getElementById("input-away").value = p.goles_away !== null ? p.goles_away : "";
 
-    // Cargar goleadores de cada equipo
+    // Mostrar modal PRIMERO
+    document.getElementById("modal").style.display = "flex";
+
+    // Después cargar goleadores
     await cargarGoleadoresModal(p.equipo_home, "goleadores-home")
     await cargarGoleadoresModal(p.equipo_away, "goleadores-away")
-
-    document.getElementById("modal").style.display = "flex";
 }
 
 async function cargarGoleadoresModal(equipo, contenedorId) {
