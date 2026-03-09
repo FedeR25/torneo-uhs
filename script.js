@@ -5,7 +5,6 @@ async function init() {
     await cargarFixture();
 }
 
-// 1. Cargar la Tabla desde el servidor
 async function cargarTabla() {
     try {
         const res = await fetch("/tabla");
@@ -16,7 +15,7 @@ async function cargarTabla() {
         tbody.innerHTML = data.map((t, i) => `
             <tr>
                 <td>${i+1}</td>
-                <td class="equipo-nombre">${t.equipo}</td>
+                <td class="equipo-nombre" onclick="abrirModalEquipo('${t.equipo}')">${t.equipo}</td>
                 <td>${t.pj}</td><td>${t.pg}</td><td>${t.pe}</td><td>${t.pp}</td>
                 <td>${t.gf}</td><td>${t.gc}</td><td>${t.df}</td>
                 <td><strong>${t.pts}</strong></td>
@@ -27,7 +26,6 @@ async function cargarTabla() {
     }
 }
 
-// 2. Cargar el Fixture
 async function cargarFixture() {
     try {
         const res = await fetch("/partidos");
@@ -56,11 +54,36 @@ async function cargarFixture() {
     }
 }
 
-// 3. Manejo del Modal
+async function abrirModalEquipo(nombre) {
+    try {
+        const res = await fetch("/partidos");
+        const partidos = await res.json();
+        const jugados = partidos.filter(p =>
+            (p.equipo_home === nombre || p.equipo_away === nombre) && p.goles_home !== null
+        );
+        document.getElementById("modal-equipo-titulo").textContent = nombre;
+        document.getElementById("modal-equipo-partidos").innerHTML = jugados.length === 0
+            ? "<p style='text-align:center;color:#aaa;padding:15px'>Sin partidos jugados todavía</p>"
+            : jugados.map(p => `
+                <div class="partido-fila">
+                    <span>${p.equipo_home}</span>
+                    <span class="score-fila">${p.goles_home} - ${p.goles_away}</span>
+                    <span>${p.equipo_away}</span>
+                </div>
+            `).join("");
+        document.getElementById("modal-equipo").classList.add("abierto");
+    } catch (err) {
+        console.error("Error cargando partidos del equipo:", err);
+    }
+}
+
+function cerrarModalEquipo() {
+    document.getElementById("modal-equipo").classList.remove("abierto");
+}
+
 function abrirModal(p) {
     partidoSeleccionado = p;
     document.getElementById("modal-titulo").innerText = `${p.equipo_home} vs ${p.equipo_away}`;
-    // Si ya tiene goles, los mostramos; si no, dejamos vacío
     document.getElementById("input-home").value = p.goles_home !== null ? p.goles_home : "";
     document.getElementById("input-away").value = p.goles_away !== null ? p.goles_away : "";
     document.getElementById("modal").style.display = "flex";
@@ -70,21 +93,14 @@ function cerrarModal() {
     document.getElementById("modal").style.display = "none"; 
 }
 
-// 4. GUARDAR RESULTADO (Corregido para evitar NaN)
 async function guardarResultado() {
     const valHome = document.getElementById("input-home").value;
     const valAway = document.getElementById("input-away").value;
 
-    // Validación: Si están vacíos, no enviamos nada
-    if (valHome === "" || valAway === "") {
-        alert("Por favor, ingresá los goles de ambos equipos.");
-        return;
-    }
-
     const gh = parseInt(valHome);
     const ga = parseInt(valAway);
 
-    const pass = prompt("Clave de Capitán (UHS2026):");
+    const pass = prompt("Clave de Capitán:");
     if (!pass) return;
 
     try {
@@ -116,7 +132,6 @@ async function guardarResultado() {
     }
 }
 
-// 5. Pestañas
 function showTab(tabId) {
     document.querySelectorAll('.seccion').forEach(s => s.style.display = 'none');
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));

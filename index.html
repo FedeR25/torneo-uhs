@@ -38,14 +38,22 @@
     <div class="modal-contenido">
       <h3 id="modal-titulo"></h3>
       <div class="modal-inputs">
-        <input id="input-home" type="number" min="0" value="0">
+        <input id="input-home" type="number" min="0">
         <span>-</span>
-        <input id="input-away" type="number" min="0" value="0">
+        <input id="input-away" type="number" min="0">
       </div>
       <div class="modal-botones">
         <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
         <button class="btn-guardar" onclick="guardarResultado()">Guardar</button>
       </div>
+    </div>
+  </div>
+
+  <div id="modal-equipo">
+    <div class="modal-equipo-contenido">
+      <h3 id="modal-equipo-titulo"></h3>
+      <div id="modal-equipo-partidos"></div>
+      <button class="btn-cerrar-equipo" onclick="cerrarModalEquipo()">Cerrar</button>
     </div>
   </div>
 
