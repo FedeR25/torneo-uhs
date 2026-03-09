@@ -41,7 +41,7 @@ test('cargar un resultado con contraseña correcta', async ({ page }) => {
   await expect(page.locator('#modal')).toBeVisible();
   await page.fill('#input-home', '2');
   await page.fill('#input-away', '1');
-  await page.click('.btn-guardar');
+  await page.locator('#modal .btn-guardar').click();
   await expect(page.locator('#modal')).toBeHidden();
 });
 
@@ -54,7 +54,7 @@ test('contraseña incorrecta mantiene el modal abierto', async ({ page }) => {
   await page.locator('.partido-card').first().click();
   await page.fill('#input-home', '1');
   await page.fill('#input-away', '1');
-  await page.click('.btn-guardar');
+  await page.locator('#modal .btn-guardar').click();
   await expect(page.locator('#modal')).toBeVisible();
 });
 
@@ -70,31 +70,4 @@ test('se ve la pestaña jugadores', async ({ page }) => {
   await page.click('text=Jugadores');
   await expect(page.locator('#jugadores h2')).toContainText('Jugadores');
   await expect(page.locator('#lista-jugadores')).not.toBeEmpty();
-});
-
-test('cargar un resultado con contraseña correcta', async ({ page }) => {
-  await page.goto(URL, { waitUntil: 'networkidle' });
-  page.on('dialog', async dialog => {
-    await dialog.accept('UHS2026');
-  });
-  await page.click('text=Fixture');
-  await page.locator('.partido-card').first().click();
-  await expect(page.locator('#modal')).toBeVisible();
-  await page.fill('#input-home', '2');
-  await page.fill('#input-away', '1');
-  await page.locator('#modal .btn-guardar').click();
-  await expect(page.locator('#modal')).toBeHidden();
-});
-
-test('contraseña incorrecta mantiene el modal abierto', async ({ page }) => {
-  await page.goto(URL, { waitUntil: 'networkidle' });
-  page.on('dialog', async dialog => {
-    await dialog.accept('wrongpass');
-  });
-  await page.click('text=Fixture');
-  await page.locator('.partido-card').first().click();
-  await page.fill('#input-home', '1');
-  await page.fill('#input-away', '1');
-  await page.locator('#modal .btn-guardar').click();
-  await expect(page.locator('#modal')).toBeVisible();
 });
