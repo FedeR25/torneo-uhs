@@ -54,4 +54,15 @@ describe("calcularTabla", () => {
     expect(magos.df).toBe(-3)
   })
 
+  test("proxima fecha devuelve partidos sin resultado", () => {
+    const partidos = [
+      { fecha: 1, equipo_home: "Dealers", equipo_away: "Magos", goles_home: 3, goles_away: 0 },
+      { fecha: 2, equipo_home: "Kaiser", equipo_away: "Caranchos", goles_home: null, goles_away: null },
+      { fecha: 2, equipo_home: "Aston Birra", equipo_away: "Golosos", goles_home: null, goles_away: null },
+    ]
+    const sinResultado = partidos.filter(p => p.goles_home === null).sort((a,b) => a.fecha - b.fecha)
+    expect(sinResultado.length).toBe(2)
+    expect(sinResultado[0].fecha).toBe(2)
+  })
+
 })

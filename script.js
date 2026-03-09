@@ -215,6 +215,37 @@ function showTab(tabId) {
     document.getElementById(tabId).style.display = 'block';
     document.getElementById('tab-' + tabId).classList.add('active');
     if (tabId === 'goleadores') cargarGoleadores();
+    if (tabId === 'proxima') cargarProximaFecha();
+}
+
+async function cargarProximaFecha() {
+    try {
+        const res = await fetch("/proxima-fecha");
+        const partidos = await res.json();
+        const container = document.getElementById("proxima-container");
+        if (!container) return;
+
+        if (partidos.length === 0) {
+            container.innerHTML = "<p style='text-align:center;color:#aaa;padding:20px'>¡Todos los partidos jugados!</p>";
+            return;
+        }
+
+        const fecha = partidos[0].fecha;
+        container.innerHTML = `
+            <div class="fecha-grupo">
+                <h3>Fecha ${fecha}</h3>
+                ${partidos.map(p => `
+                    <div class="partido-card" onclick='abrirModal(${JSON.stringify(p)})'>
+                        <span>${p.equipo_home}</span>
+                        <div class="resultado-badge">vs</div>
+                        <span>${p.equipo_away}</span>
+                    </div>
+                `).join("")}
+            </div>
+        `;
+    } catch (err) {
+        console.error("Error cargando próxima fecha:", err);
+    }
 }
 
 init();

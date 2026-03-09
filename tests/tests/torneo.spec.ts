@@ -71,4 +71,12 @@ test('contraseña incorrecta muestra error', async ({ page }) => {
 
   // Verificar que aparece el alert de error
   await expect(page.locator('#modal')).toBeVisible();
+
+test('se ve la pestaña próxima fecha', async ({ page }) => {
+  await page.goto(URL);
+  await page.click('text=Próxima Fecha');
+  await expect(page.locator('#proxima h2')).toContainText('Próxima Fecha');
+  await expect(page.locator('#proxima-container')).not.toBeEmpty();
+});
+
 });

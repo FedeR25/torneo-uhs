@@ -193,4 +193,18 @@ app.get("/goleadores", async (req, res) => {
   }
 })
 
+app.get("/proxima-fecha", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT * FROM partidos 
+      WHERE goles_home IS NULL 
+      ORDER BY fecha ASC 
+      LIMIT 3
+    `)
+    res.json(result.rows)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 startServer();
