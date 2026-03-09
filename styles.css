@@ -24,12 +24,20 @@ th, td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; }
 
 /* MODAL RESULTADO */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 100; }
-.modal-contenido { background: #fff; border-radius: 12px; padding: 25px; width: 320px; border-top: 5px solid #1A4F9C; }
+.modal-contenido { background: #fff; border-radius: 12px; padding: 25px; width: 340px; border-top: 5px solid #1A4F9C; max-height: 90vh; overflow-y: auto; }
 .modal-inputs { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 20px 0; }
 .modal-inputs input { width: 60px; font-size: 24px; text-align: center; border: 2px solid #1A4F9C; border-radius: 8px; padding: 5px; }
-.modal-botones { display: flex; gap: 10px; }
+.modal-botones { display: flex; gap: 10px; margin-top: 15px; }
 .btn-guardar { flex: 1; background: #1A4F9C; color: #fff; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 .btn-cancelar { flex: 1; background: #eee; border: none; padding: 10px; border-radius: 6px; cursor: pointer; }
+
+/* GOLEADORES EN MODAL */
+.goleadores-seccion { margin-bottom: 10px; }
+.goleadores-seccion h4 { color: #1A4F9C; font-size: 0.85rem; margin-bottom: 8px; border-left: 3px solid #C0272D; padding-left: 8px; }
+.goleador-fila { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+.goleador-fila:last-child { border-bottom: none; }
+.goleador-fila span { flex: 1; }
+.goleador-input { width: 45px; text-align: center; border: 1px solid #1A4F9C; border-radius: 4px; padding: 3px; font-size: 0.9rem; }
 
 /* MODAL EQUIPO */
 #modal-equipo { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 100; }
@@ -47,15 +55,12 @@ th, td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; }
 @media (max-width: 600px) {
   body { padding: 10px; }
   h1 { font-size: 1.4rem; }
-  
   th, td { padding: 8px 5px; font-size: 0.8rem; }
   th:nth-child(5), td:nth-child(5),
   th:nth-child(6), td:nth-child(6) { display: none; }
-
   .partido-card { padding: 10px; }
   .partido-card span { font-size: 0.85rem; }
   .resultado-badge { padding: 4px 8px; margin: 0 8px; min-width: 45px; font-size: 0.85rem; }
-
   .modal-contenido { width: 90%; }
   .modal-equipo-contenido { width: 90%; }
 }
