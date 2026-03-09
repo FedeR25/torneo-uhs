@@ -97,8 +97,8 @@ async function guardarResultado() {
     const valHome = document.getElementById("input-home").value;
     const valAway = document.getElementById("input-away").value;
 
-    const gh = parseInt(valHome);
-    const ga = parseInt(valAway);
+    const gh = valHome === "" ? null : parseInt(valHome);
+    const ga = valAway === "" ? null : parseInt(valAway);
 
     const pass = prompt("Clave de Capitán:");
     if (!pass) return;
