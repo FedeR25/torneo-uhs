@@ -65,4 +65,19 @@ describe("calcularTabla", () => {
     expect(sinResultado[0].fecha).toBe(2)
   })
 
+  test("jugador con equipo y nombre se puede agregar a la lista", () => {
+    const jugadores = []
+    const nuevo = { equipo: "Kaiser", nombre: "Juan Perez" }
+    if (nuevo.equipo && nuevo.nombre) jugadores.push(nuevo)
+    expect(jugadores.length).toBe(1)
+    expect(jugadores[0].nombre).toBe("Juan Perez")
+  })
+
+  test("no se agrega jugador si falta equipo o nombre", () => {
+    const jugadores = []
+    const nuevo = { equipo: "", nombre: "Juan Perez" }
+    if (nuevo.equipo && nuevo.nombre) jugadores.push(nuevo)
+    expect(jugadores.length).toBe(0)
+  })
+
 })

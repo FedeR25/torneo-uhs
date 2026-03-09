@@ -64,3 +64,10 @@ test('se ve la pestaña próxima fecha', async ({ page }) => {
   await expect(page.locator('#proxima h2')).toContainText('Próxima Fecha');
   await expect(page.locator('#proxima-container')).not.toBeEmpty();
 });
+
+test('se ve la pestaña jugadores', async ({ page }) => {
+  await page.goto(URL, { waitUntil: 'networkidle' });
+  await page.click('text=Jugadores');
+  await expect(page.locator('#jugadores h2')).toContainText('Jugadores');
+  await expect(page.locator('#lista-jugadores')).not.toBeEmpty();
+});

@@ -15,6 +15,7 @@
     <button id="tab-fixture" class="tab" onclick="showTab('fixture')">Fixture</button>
     <button id="tab-goleadores" class="tab" onclick="showTab('goleadores')">Goleadores</button>
     <button id="tab-proxima" class="tab" onclick="showTab('proxima')">Próxima Fecha</button>
+    <button id="tab-jugadores" class="tab" onclick="showTab('jugadores')">Jugadores</button>
   </div>
 
   <div id="tabla" class="seccion">
@@ -49,6 +50,25 @@
       </table>
     </div>
   </div>
+  
+<div id="jugadores" class="seccion" style="display:none">
+  <h2>Jugadores</h2>
+  <div class="jugadores-form">
+    <select id="select-equipo">
+      <option value="">Seleccioná un equipo</option>
+      <option>Dealers</option>
+      <option>Aston Birra</option>
+      <option>Kaiser</option>
+      <option>Caranchos</option>
+      <option>Magos</option>
+      <option>Golosos</option>
+    </select>
+    <input id="input-nombre-jugador" type="text" placeholder="Nombre del jugador">
+    <button class="btn-guardar" onclick="agregarJugador()">Agregar</button>
+  </div>
+  <div id="lista-jugadores"></div>
+</div>
+
 
   <div id="proxima" class="seccion" style="display:none">
     <h2>Próxima Fecha</h2>

@@ -207,4 +207,44 @@ app.get("/proxima-fecha", async (req, res) => {
   }
 })
 
+app.post("/jugadores", async (req, res) => {
+  const { equipo, nombre, password } = req.body
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: "Clave incorrecta" })
+  }
+  try {
+    await pool.query(
+      "INSERT INTO jugadores (equipo, nombre) VALUES ($1, $2)",
+      [equipo, nombre]
+    )
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.delete("/jugadores/:id", async (req, res) => {
+  const { password } = req.body
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: "Clave incorrecta" })
+  }
+  try {
+    await pool.query("DELETE FROM jugadores WHERE id = $1", [req.params.id])
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.get("/jugadores", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM jugadores ORDER BY equipo ASC, nombre ASC"
+    )
+    res.json(result.rows)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 startServer();

@@ -216,6 +216,8 @@ function showTab(tabId) {
     document.getElementById('tab-' + tabId).classList.add('active');
     if (tabId === 'goleadores') cargarGoleadores();
     if (tabId === 'proxima') cargarProximaFecha();
+    if (tabId === 'jugadores') cargarJugadores();
+
 }
 
 async function cargarProximaFecha() {
@@ -245,6 +247,92 @@ async function cargarProximaFecha() {
         `;
     } catch (err) {
         console.error("Error cargando próxima fecha:", err);
+    }
+}
+
+async function cargarJugadores() {
+    try {
+        const res = await fetch("/jugadores");
+        const jugadores = await res.json();
+        const container = document.getElementById("lista-jugadores");
+        if (!container) return;
+
+        if (jugadores.length === 0) {
+            container.innerHTML = "<p style='text-align:center;color:#aaa;padding:20px'>Sin jugadores cargados todavía</p>";
+            return;
+        }
+
+        // Agrupar por equipo
+        const porEquipo = {};
+        jugadores.forEach(j => {
+            if (!porEquipo[j.equipo]) porEquipo[j.equipo] = [];
+            porEquipo[j.equipo].push(j);
+        });
+
+        container.innerHTML = Object.entries(porEquipo).map(([equipo, jugadores]) => `
+            <div class="equipo-jugadores">
+                <h3>${equipo}</h3>
+                ${jugadores.map(j => `
+                    <div class="jugador-item">
+                        <span>${j.nombre}</span>
+                        <button class="btn-eliminar" onclick="eliminarJugador(${j.id})">Eliminar</button>
+                    </div>
+                `).join("")}
+            </div>
+        `).join("");
+    } catch (err) {
+        console.error("Error cargando jugadores:", err);
+    }
+}
+
+async function agregarJugador() {
+    const equipo = document.getElementById("select-equipo").value;
+    const nombre = document.getElementById("input-nombre-jugador").value.trim();
+
+    if (!equipo || !nombre) {
+        alert("Seleccioná un equipo y escribí el nombre del jugador");
+        return;
+    }
+
+    const pass = prompt("Clave de Capitán:");
+    if (!pass) return;
+
+    try {
+        const res = await fetch("/jugadores", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ equipo, nombre, password: pass })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            document.getElementById("input-nombre-jugador").value = "";
+            await cargarJugadores();
+        } else {
+            alert("❌ Error: " + data.error);
+        }
+    } catch (err) {
+        alert("❌ Error de conexión");
+    }
+}
+
+async function eliminarJugador(id) {
+    const pass = prompt("Clave de Capitán:");
+    if (!pass) return;
+
+    try {
+        const res = await fetch(`/jugadores/${id}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password: pass })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            await cargarJugadores();
+        } else {
+            alert("❌ Error: " + data.error);
+        }
+    } catch (err) {
+        alert("❌ Error de conexión");
     }
 }
 
