@@ -1,10 +1,9 @@
 const { Pool } = require('pg');
 
-// Render llena process.env.DATABASE_URL automáticamente con la Internal URL que pegaste
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false // Esto es necesario para que Render acepte la conexión segura
+    rejectUnauthorized: false
   }
 });
 
@@ -21,6 +20,24 @@ async function inicializarTablas() {
         goles_away INTEGER
       );
     `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS jugadores (
+        id SERIAL PRIMARY KEY,
+        equipo TEXT NOT NULL,
+        nombre TEXT NOT NULL
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS goles (
+        id SERIAL PRIMARY KEY,
+        partido_id INTEGER NOT NULL,
+        jugador_id INTEGER NOT NULL,
+        cantidad INTEGER NOT NULL DEFAULT 1
+      );
+    `);
+
     console.log("Estructura de base de datos verificada ✅");
   } catch (err) {
     console.error("Error al inicializar tablas:", err);
