@@ -54,7 +54,7 @@ th, td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; }
 .btn-cerrar-equipo { width: 100%; margin-top: 15px; padding: 10px; background: #1A4F9C; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
 /* JUGADORES */
-.jugadores-form { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.jugadores-form { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; max-width: 600px; }
 .jugadores-form select, .jugadores-form input { flex: 1; padding: 10px; border: 2px solid #1A4F9C; border-radius: 6px; font-size: 0.9rem; min-width: 150px; }
 .jugadores-form button { padding: 10px 20px; }
 
