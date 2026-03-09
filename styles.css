@@ -57,6 +57,9 @@ th, td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; }
 /* MODAL EQUIPO SECCIONES */
 .modal-seccion { margin-bottom: 15px; }
 .modal-seccion h4 { color: #1A4F9C; font-size: 0.85rem; margin-bottom: 8px; border-left: 3px solid #C0272D; padding-left: 8px; }
+.goleador-equipo-fila { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #eee; }
+.goleador-equipo-fila:last-child { border-bottom: none; }
+.goles-badge { background: #1A4F9C; color: #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; }
 
 /* JUGADORES */
 .jugadores-form { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; max-width: 600px; }

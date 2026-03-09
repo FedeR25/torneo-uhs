@@ -1,5 +1,12 @@
 let partidoSeleccionado = null;
 
+function getFechaReal(numeroFecha) {
+    const fecha1 = new Date(2026, 2, 4);
+    const fecha = new Date(fecha1);
+    fecha.setDate(fecha1.getDate() + (numeroFecha - 1) * 7);
+    return fecha.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
+}
+
 async function init() {
     await cargarTabla();
     await cargarFixture();
@@ -37,7 +44,7 @@ async function cargarFixture() {
 
         container.innerHTML = fechas.map(f => `
             <div class="fecha-grupo">
-                <h3>Fecha ${f}</h3>
+                <h3>Fecha ${f} — ${getFechaReal(f)}</h3>
                 ${partidos.filter(p => p.fecha === f).map(p => `
                     <div class="partido-card" onclick='abrirModal(${JSON.stringify(p)})'>
                         <span>${p.equipo_home}</span>
@@ -102,9 +109,9 @@ async function abrirModalEquipo(nombre) {
                 <div class="modal-seccion">
                     <h4>⚽ Goleadores</h4>
                     ${goleadores.map(g => `
-                        <div class="partido-fila">
+                        <div class="goleador-equipo-fila">
                             <span>${g.nombre}</span>
-                            <span class="score-fila">${g.total}</span>
+                            <span class="goles-badge">${g.total}</span>
                         </div>
                     `).join("")}
                 </div>
@@ -154,10 +161,8 @@ async function abrirModal(p) {
     document.getElementById("input-home").value = p.goles_home !== null ? p.goles_home : "";
     document.getElementById("input-away").value = p.goles_away !== null ? p.goles_away : "";
 
-    // Mostrar modal PRIMERO
     document.getElementById("modal").style.display = "flex";
 
-    // Después cargar goleadores
     await cargarGoleadoresModal(p.equipo_home, "goleadores-home")
     await cargarGoleadoresModal(p.equipo_away, "goleadores-away")
 }
@@ -221,7 +226,6 @@ async function guardarResultado() {
         const data = await res.json();
 
         if (res.ok) {
-            // Guardar goles de jugadores
             const inputs = document.querySelectorAll(".goleador-input")
             const goles = []
             inputs.forEach(input => {
@@ -259,7 +263,6 @@ function showTab(tabId) {
     if (tabId === 'goleadores') cargarGoleadores();
     if (tabId === 'proxima') cargarProximaFecha();
     if (tabId === 'jugadores') cargarJugadores();
-
 }
 
 async function cargarProximaFecha() {
@@ -277,7 +280,7 @@ async function cargarProximaFecha() {
         const fecha = partidos[0].fecha;
         container.innerHTML = `
             <div class="fecha-grupo">
-                <h3>Fecha ${fecha}</h3>
+                <h3>Fecha ${fecha} — ${getFechaReal(fecha)}</h3>
                 ${partidos.map(p => `
                     <div class="partido-card" onclick='abrirModal(${JSON.stringify(p)})'>
                         <span>${p.equipo_home}</span>
@@ -304,7 +307,6 @@ async function cargarJugadores() {
             return;
         }
 
-        // Agrupar por equipo
         const porEquipo = {};
         jugadores.forEach(j => {
             if (!porEquipo[j.equipo]) porEquipo[j.equipo] = [];
@@ -358,7 +360,7 @@ async function agregarJugador() {
 }
 
 async function eliminarJugador(id) {
-    const pass = prompt("Clave de Capitán:");
+    const pass = prompt("Clave Admin:");
     if (!pass) return;
 
     try {
@@ -376,13 +378,6 @@ async function eliminarJugador(id) {
     } catch (err) {
         alert("❌ Error de conexión");
     }
-}
-
-function getFechaReal(numeroFecha) {
-    const fecha1 = new Date(2026, 2, 4); // 4 de marzo 2026
-    const fecha = new Date(fecha1);
-    fecha.setDate(fecha1.getDate() + (numeroFecha - 1) * 7);
-    return fecha.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
 }
 
 init();
