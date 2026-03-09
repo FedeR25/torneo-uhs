@@ -30,3 +30,45 @@ test('al hacer clic en un partido se abre el modal', async ({ page }) => {
   await page.locator('.partido-card').first().click();
   await expect(page.locator('#modal')).toBeVisible();
 });
+
+test('cargar un resultado con contraseña correcta', async ({ page }) => {
+  await page.goto(URL);
+  
+  // Interceptar el prompt de contraseña
+  page.on('dialog', async dialog => {
+    await dialog.accept('UHS2026');
+  });
+
+  await page.click('text=Fixture');
+  await page.locator('.partido-card').first().click();
+  await expect(page.locator('#modal')).toBeVisible();
+
+  await page.fill('#input-home', '2');
+  await page.fill('#input-away', '1');
+  await page.click('.btn-guardar');
+
+  // Verificar que el modal se cerró y la página recargó
+  await expect(page.locator('#modal')).toBeHidden();
+});
+
+test('contraseña incorrecta muestra error', async ({ page }) => {
+  await page.goto(URL);
+
+  // Interceptar el prompt con contraseña incorrecta
+  page.on('dialog', async dialog => {
+    if (dialog.type() === 'prompt') {
+      await dialog.accept('contraseña_incorrecta');
+    } else {
+      await dialog.accept();
+    }
+  });
+
+  await page.click('text=Fixture');
+  await page.locator('.partido-card').first().click();
+  await page.fill('#input-home', '1');
+  await page.fill('#input-away', '1');
+  await page.click('.btn-guardar');
+
+  // Verificar que aparece el alert de error
+  await expect(page.locator('#modal')).toBeVisible();
+});
