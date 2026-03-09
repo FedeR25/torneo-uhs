@@ -148,4 +148,49 @@ app.get("/admin/cargar-jugadores", async (req, res) => {
   }
 })
 
+app.get("/jugadores/:equipo", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM jugadores WHERE equipo = $1 ORDER BY nombre ASC",
+      [req.params.equipo]
+    )
+    res.json(result.rows)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.post("/goles", async (req, res) => {
+  const { partido_id, goles } = req.body
+  try {
+    await pool.query("DELETE FROM goles WHERE partido_id = $1", [partido_id])
+    for (const g of goles) {
+      if (g.cantidad > 0) {
+        await pool.query(
+          "INSERT INTO goles (partido_id, jugador_id, cantidad) VALUES ($1, $2, $3)",
+          [partido_id, g.jugador_id, g.cantidad]
+        )
+      }
+    }
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.get("/goleadores", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT j.nombre, j.equipo, SUM(g.cantidad) as total
+      FROM goles g
+      JOIN jugadores j ON j.id = g.jugador_id
+      GROUP BY j.nombre, j.equipo
+      ORDER BY total DESC
+    `)
+    res.json(result.rows)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 startServer();
