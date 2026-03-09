@@ -29,3 +29,6 @@ jobs:
 
       - name: Correr Tests E2E
         run: npx playwright test
+        env:
+          CAPTAIN_PASSWORD: ${{ secrets.CAPTAIN_PASSWORD }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}

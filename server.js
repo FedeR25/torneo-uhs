@@ -7,12 +7,10 @@ app.use(express.static("."));
 
 const equiposList = ["Dealers", "Aston Birra", "Kaiser", "Caranchos", "Magos", "Golosos"];
 
-// Función para arrancar la base de datos antes que las rutas
 async function startServer() {
   try {
     await inicializarTablas();
     console.log("Estructura de base de datos verificada ✅");
-    
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
       console.log(`Servidor UHS corriendo en el puerto ${PORT} 🚀`);
@@ -23,12 +21,10 @@ async function startServer() {
   }
 }
 
-// 1. Obtener lista de equipos
 app.get("/equipos", (req, res) => {
   res.json(equiposList);
 });
 
-// 2. Obtener fixture completo
 app.get("/partidos", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM partidos ORDER BY fecha ASC");
@@ -39,16 +35,14 @@ app.get("/partidos", async (req, res) => {
   }
 });
 
-// 3. ACTUALIZAR RESULTADO (Con Debug de Clave)
 app.post("/resultado", async (req, res) => {
   const { fecha, equipo_home, equipo_away, goles_home, goles_away, password } = req.body;
 
-  // ESTO ES PARA DEBUGEAR EN RENDER LOGS
   console.log("--- Intento de carga ---");
   console.log("Recibido:", password);
-  console.log("Esperado (Env):", process.env.ADMIN_PASSWORD);
+  console.log("Esperado (Env):", process.env.CAPTAIN_PASSWORD);
 
-  if (!password || password !== process.env.ADMIN_PASSWORD) {
+  if (!password || password !== process.env.CAPTAIN_PASSWORD) {
     return res.status(401).json({ error: "Clave incorrecta" });
   }
 
@@ -73,7 +67,6 @@ app.post("/resultado", async (req, res) => {
   }
 });
 
-// 4. RUTA DE LA TABLA (Cálculo automático)
 app.get("/tabla", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM partidos WHERE goles_home IS NOT NULL");
@@ -91,12 +84,9 @@ app.get("/tabla", async (req, res) => {
       const away = p.equipo_away;
 
       if (tabla[home] && tabla[away]) {
-        tabla[home].pj++;
-        tabla[away].pj++;
-        tabla[home].gf += gH;
-        tabla[home].gc += gA;
-        tabla[away].gf += gA;
-        tabla[away].gc += gH;
+        tabla[home].pj++; tabla[away].pj++;
+        tabla[home].gf += gH; tabla[home].gc += gA;
+        tabla[away].gf += gA; tabla[away].gc += gH;
 
         if (gH > gA) {
           tabla[home].pg++; tabla[home].pts += 3;
@@ -125,29 +115,6 @@ app.get("/tabla", async (req, res) => {
   }
 });
 
-app.get("/admin/cargar-jugadores", async (req, res) => {
-  const jugadores = [
-    { equipo: "Aston Birra", nombre: "Fabian Koch" },
-    { equipo: "Aston Birra", nombre: "Paul Saban" },
-    { equipo: "Aston Birra", nombre: "Miguel Gonzalez" },
-    { equipo: "Aston Birra", nombre: "Nicolas Toscano" },
-    { equipo: "Aston Birra", nombre: "Nicolas Rosseti" },
-    { equipo: "Aston Birra", nombre: "Martin Celador" },
-    { equipo: "Aston Birra", nombre: "Federico Ramundo" },
-    { equipo: "Aston Birra", nombre: "Marcelo Koblecosky" },
-    { equipo: "Aston Birra", nombre: "Santiago Ricci" },
-  ]
-  try {
-    await pool.query("DELETE FROM jugadores WHERE equipo = 'Aston Birra'")
-    for (const j of jugadores) {
-      await pool.query("INSERT INTO jugadores (equipo, nombre) VALUES ($1, $2)", [j.equipo, j.nombre])
-    }
-    res.json({ ok: true, mensaje: `${jugadores.length} jugadores cargados` })
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
 app.get("/jugadores/:equipo", async (req, res) => {
   try {
     const result = await pool.query(
@@ -155,6 +122,46 @@ app.get("/jugadores/:equipo", async (req, res) => {
       [req.params.equipo]
     )
     res.json(result.rows)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.get("/jugadores", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM jugadores ORDER BY equipo ASC, nombre ASC"
+    )
+    res.json(result.rows)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.post("/jugadores", async (req, res) => {
+  const { equipo, nombre, password } = req.body
+  if (password !== process.env.CAPTAIN_PASSWORD) {
+    return res.status(401).json({ error: "Clave incorrecta" })
+  }
+  try {
+    await pool.query(
+      "INSERT INTO jugadores (equipo, nombre) VALUES ($1, $2)",
+      [equipo, nombre]
+    )
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.delete("/jugadores/:id", async (req, res) => {
+  const { password } = req.body
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: "Clave incorrecta" })
+  }
+  try {
+    await pool.query("DELETE FROM jugadores WHERE id = $1", [req.params.id])
+    res.json({ ok: true })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
@@ -201,46 +208,6 @@ app.get("/proxima-fecha", async (req, res) => {
       ORDER BY fecha ASC 
       LIMIT 3
     `)
-    res.json(result.rows)
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-app.post("/jugadores", async (req, res) => {
-  const { equipo, nombre, password } = req.body
-  if (password !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ error: "Clave incorrecta" })
-  }
-  try {
-    await pool.query(
-      "INSERT INTO jugadores (equipo, nombre) VALUES ($1, $2)",
-      [equipo, nombre]
-    )
-    res.json({ ok: true })
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-app.delete("/jugadores/:id", async (req, res) => {
-  const { password } = req.body
-  if (password !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ error: "Clave incorrecta" })
-  }
-  try {
-    await pool.query("DELETE FROM jugadores WHERE id = $1", [req.params.id])
-    res.json({ ok: true })
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-app.get("/jugadores", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM jugadores ORDER BY equipo ASC, nombre ASC"
-    )
     res.json(result.rows)
   } catch (err) {
     res.status(500).json({ error: err.message })
