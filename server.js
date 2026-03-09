@@ -7,6 +7,17 @@ app.use(express.static("."));
 
 const equiposList = ["Dealers", "Aston Birra", "Kaiser", "Caranchos", "Magos", "Golosos"];
 
+async function log(accion, detalle) {
+  try {
+    await pool.query(
+      "INSERT INTO logs (accion, detalle) VALUES ($1, $2)",
+      [accion, detalle]
+    )
+  } catch (err) {
+    console.error("Error guardando log:", err)
+  }
+}
+
 async function startServer() {
   try {
     await inicializarTablas();
@@ -43,6 +54,7 @@ app.post("/resultado", async (req, res) => {
   console.log("Esperado (Env):", process.env.CAPTAIN_PASSWORD);
 
   if (!password || password !== process.env.CAPTAIN_PASSWORD) {
+    await log("CLAVE_INCORRECTA", `Intento fallido en /resultado`);
     return res.status(401).json({ error: "Clave incorrecta" });
   }
 
@@ -60,6 +72,7 @@ app.post("/resultado", async (req, res) => {
       return res.status(404).json({ error: "No se encontró el partido en la base de datos" });
     }
 
+    await log("RESULTADO_CARGADO", `Fecha ${fecha}: ${equipo_home} ${goles_home} - ${goles_away} ${equipo_away}`);
     res.json({ ok: true });
   } catch (err) {
     console.error("Error en DB:", err);
@@ -141,6 +154,7 @@ app.get("/jugadores", async (req, res) => {
 app.post("/jugadores", async (req, res) => {
   const { equipo, nombre, password } = req.body
   if (password !== process.env.CAPTAIN_PASSWORD) {
+    await log("CLAVE_INCORRECTA", `Intento fallido en /jugadores`)
     return res.status(401).json({ error: "Clave incorrecta" })
   }
   try {
@@ -148,6 +162,7 @@ app.post("/jugadores", async (req, res) => {
       "INSERT INTO jugadores (equipo, nombre) VALUES ($1, $2)",
       [equipo, nombre]
     )
+    await log("JUGADOR_AGREGADO", `${nombre} (${equipo})`)
     res.json({ ok: true })
   } catch (err) {
     res.status(500).json({ error: err.message })
@@ -157,10 +172,12 @@ app.post("/jugadores", async (req, res) => {
 app.delete("/jugadores/:id", async (req, res) => {
   const { password } = req.body
   if (password !== process.env.ADMIN_PASSWORD) {
+    await log("CLAVE_INCORRECTA", `Intento fallido en /jugadores DELETE`)
     return res.status(401).json({ error: "Clave incorrecta" })
   }
   try {
     await pool.query("DELETE FROM jugadores WHERE id = $1", [req.params.id])
+    await log("JUGADOR_ELIMINADO", `ID: ${req.params.id}`)
     res.json({ ok: true })
   } catch (err) {
     res.status(500).json({ error: err.message })
@@ -208,6 +225,21 @@ app.get("/proxima-fecha", async (req, res) => {
       ORDER BY fecha ASC 
       LIMIT 3
     `)
+    res.json(result.rows)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.get("/admin/logs", async (req, res) => {
+  const { password } = req.query
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: "Clave incorrecta" })
+  }
+  try {
+    const result = await pool.query(
+      "SELECT * FROM logs ORDER BY fecha_hora DESC LIMIT 100"
+    )
     res.json(result.rows)
   } catch (err) {
     res.status(500).json({ error: err.message })

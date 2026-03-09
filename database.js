@@ -37,6 +37,15 @@ async function inicializarTablas() {
         cantidad INTEGER NOT NULL DEFAULT 1
       );
     `);
+    
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS logs (
+        id SERIAL PRIMARY KEY,
+        accion TEXT NOT NULL,
+        detalle TEXT,
+        fecha_hora TIMESTAMP DEFAULT NOW()
+      );
+    `);
 
     console.log("Estructura de base de datos verificada ✅");
   } catch (err) {
