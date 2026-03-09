@@ -130,7 +130,7 @@ async function abrirModalEquipo(nombre) {
                     ${proximos.slice(0, 3).map(p => `
                         <div class="partido-fila">
                             <span>${p.equipo_home}</span>
-                            <span class="score-fila">F${p.fecha}</span>
+                            <span class="score-fila">${getFechaReal(p.fecha)}</span>
                             <span>${p.equipo_away}</span>
                         </div>
                     `).join("")}
@@ -376,6 +376,13 @@ async function eliminarJugador(id) {
     } catch (err) {
         alert("❌ Error de conexión");
     }
+}
+
+function getFechaReal(numeroFecha) {
+    const fecha1 = new Date(2026, 2, 4); // 4 de marzo 2026
+    const fecha = new Date(fecha1);
+    fecha.setDate(fecha1.getDate() + (numeroFecha - 1) * 7);
+    return fecha.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
 }
 
 init();
