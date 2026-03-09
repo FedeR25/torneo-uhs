@@ -47,10 +47,10 @@ th, td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; }
 #modal-equipo.abierto { display: flex; }
 .modal-equipo-contenido { background: #fff; border-radius: 12px; padding: 25px; width: 350px; max-height: 80vh; overflow-y: auto; border-top: 5px solid #1A4F9C; }
 .modal-equipo-contenido h3 { color: #1A4F9C; text-align: center; margin-bottom: 15px; }
-.partido-fila { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+.partido-fila { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
 .partido-fila:last-child { border-bottom: none; }
-.partido-fila span:first-child { text-align: right; font-weight: bold; }
-.partido-fila span:last-child { text-align: left; font-weight: bold; }
+.partido-fila span:first-child { text-align: right; font-weight: bold; flex: 1; }
+.partido-fila span:last-child { text-align: left; font-weight: bold; flex: 1; }
 .score-fila { background: #1A4F9C; color: #fff; border-radius: 5px; padding: 3px 10px; text-align: center; margin: 0 10px; min-width: 50px; font-weight: bold; }
 .btn-cerrar-equipo { width: 100%; margin-top: 15px; padding: 10px; background: #1A4F9C; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
