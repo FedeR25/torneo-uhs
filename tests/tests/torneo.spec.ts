@@ -33,28 +33,30 @@ test('al hacer clic en un partido se abre el modal', async ({ page }) => {
 
 test('cargar un resultado con contraseña correcta', async ({ page }) => {
   await page.goto(URL, { waitUntil: 'networkidle' });
-  page.on('dialog', async dialog => {
-    await dialog.accept('UHS2026');
-  });
   await page.click('text=Fixture');
   await page.locator('.partido-card').first().click();
   await expect(page.locator('#modal')).toBeVisible();
   await page.fill('#input-home', '2');
   await page.fill('#input-away', '1');
   await page.locator('#modal .btn-guardar').click();
-  await expect(page.locator('#modal')).toBeHidden();
+  // Llenar el nuevo modal de clave
+  await expect(page.locator('#modal-clave')).toBeVisible();
+  await page.fill('#modal-clave-input', process.env.CAPTAIN_PASSWORD || 'UHS2026');
+  await page.locator('#modal-clave-confirmar').click();
+  await expect(page.locator('#modal')).toBeHidden({ timeout: 10000 });
 });
 
 test('contraseña incorrecta mantiene el modal abierto', async ({ page }) => {
   await page.goto(URL, { waitUntil: 'networkidle' });
-  page.on('dialog', async dialog => {
-    await dialog.accept('wrongpass');
-  });
   await page.click('text=Fixture');
   await page.locator('.partido-card').first().click();
   await page.fill('#input-home', '1');
   await page.fill('#input-away', '1');
   await page.locator('#modal .btn-guardar').click();
+  // Llenar el nuevo modal de clave con contraseña incorrecta
+  await expect(page.locator('#modal-clave')).toBeVisible();
+  await page.fill('#modal-clave-input', 'wrongpass');
+  await page.locator('#modal-clave-confirmar').click();
   await expect(page.locator('#modal')).toBeVisible();
 });
 
