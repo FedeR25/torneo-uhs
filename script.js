@@ -7,6 +7,42 @@ function getFechaReal(numeroFecha) {
     return fecha.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
 }
 
+// ─── MODAL DE CONTRASEÑA PERSONALIZADO ───────────────────────────────────────
+function pedirClave(titulo, callback) {
+    document.getElementById("modal-clave-titulo").textContent = titulo;
+    document.getElementById("modal-clave-input").value = "";
+    document.getElementById("modal-clave").style.display = "flex";
+    setTimeout(() => document.getElementById("modal-clave-input").focus(), 100);
+
+    document.getElementById("modal-clave-confirmar").onclick = () => {
+        const val = document.getElementById("modal-clave-input").value;
+        cerrarModalClave();
+        if (val) callback(val);
+    };
+
+    document.getElementById("modal-clave-input").onkeydown = (e) => {
+        if (e.key === "Enter") document.getElementById("modal-clave-confirmar").click();
+        if (e.key === "Escape") cerrarModalClave();
+    };
+}
+
+function cerrarModalClave() {
+    document.getElementById("modal-clave").style.display = "none";
+}
+
+function mostrarMensaje(texto, esError = false) {
+    document.getElementById("modal-mensaje-texto").textContent = texto;
+    const modal = document.getElementById("modal-mensaje");
+    modal.style.display = "flex";
+    const box = modal.querySelector(".modal-mensaje-box");
+    box.style.borderTop = esError ? "4px solid #C0272D" : "4px solid #1A4F9C";
+}
+
+function cerrarModalMensaje() {
+    document.getElementById("modal-mensaje").style.display = "none";
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 async function init() {
     await cargarTabla();
     await cargarFixture();
@@ -206,53 +242,52 @@ async function guardarResultado() {
     const gh = valHome === "" ? null : parseInt(valHome);
     const ga = valAway === "" ? null : parseInt(valAway);
 
-    const pass = prompt("Clave de Capitán:");
-    if (!pass) return;
-
-    try {
-        const res = await fetch("/resultado", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                fecha: parseInt(partidoSeleccionado.fecha),
-                equipo_home: partidoSeleccionado.equipo_home,
-                equipo_away: partidoSeleccionado.equipo_away,
-                goles_home: gh,
-                goles_away: ga,
-                password: pass
-            })
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-            const inputs = document.querySelectorAll(".goleador-input")
-            const goles = []
-            inputs.forEach(input => {
-                const cantidad = parseInt(input.value) || 0
-                if (cantidad > 0) {
-                    goles.push({ jugador_id: parseInt(input.dataset.jugador), cantidad })
-                }
-            })
-
-            if (goles.length > 0) {
-                await fetch("/goles", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ partido_id: partidoSeleccionado.id, goles })
+    pedirClave("Clave de Capitán", async (pass) => {
+        try {
+            const res = await fetch("/resultado", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    fecha: parseInt(partidoSeleccionado.fecha),
+                    equipo_home: partidoSeleccionado.equipo_home,
+                    equipo_away: partidoSeleccionado.equipo_away,
+                    goles_home: gh,
+                    goles_away: ga,
+                    password: pass
                 })
-            }
+            });
 
-            alert("✅ ¡Guardado con éxito!"); 
-            cerrarModal();
-            location.reload(); 
-        } else { 
-            alert("❌ Error: " + (data.error || "Clave incorrecta")); 
+            const data = await res.json();
+
+            if (res.ok) {
+                const inputs = document.querySelectorAll(".goleador-input")
+                const goles = []
+                inputs.forEach(input => {
+                    const cantidad = parseInt(input.value) || 0
+                    if (cantidad > 0) {
+                        goles.push({ jugador_id: parseInt(input.dataset.jugador), cantidad })
+                    }
+                })
+
+                if (goles.length > 0) {
+                    await fetch("/goles", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ partido_id: partidoSeleccionado.id, goles })
+                    })
+                }
+
+                cerrarModal();
+                mostrarMensaje("✅ ¡Resultado guardado con éxito!");
+                setTimeout(() => { cerrarModalMensaje(); location.reload(); }, 1500);
+            } else { 
+                mostrarMensaje("❌ " + (data.error || "Clave incorrecta"), true);
+            }
+        } catch (error) {
+            console.error("Error en fetch:", error);
+            mostrarMensaje("❌ Error de conexión con el servidor.", true);
         }
-    } catch (error) {
-        console.error("Error en fetch:", error);
-        alert("❌ Error de conexión con el servidor.");
-    }
+    });
 }
 
 function showTab(tabId) {
@@ -334,50 +369,50 @@ async function agregarJugador() {
     const nombre = document.getElementById("input-nombre-jugador").value.trim();
 
     if (!equipo || !nombre) {
-        alert("Seleccioná un equipo y escribí el nombre del jugador");
+        mostrarMensaje("Seleccioná un equipo y escribí el nombre del jugador", true);
         return;
     }
 
-    const pass = prompt("Clave de Capitán:");
-    if (!pass) return;
-
-    try {
-        const res = await fetch("/jugadores", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ equipo, nombre, password: pass })
-        });
-        const data = await res.json();
-        if (res.ok) {
-            document.getElementById("input-nombre-jugador").value = "";
-            await cargarJugadores();
-        } else {
-            alert("❌ Error: " + data.error);
+    pedirClave("Clave de Capitán", async (pass) => {
+        try {
+            const res = await fetch("/jugadores", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ equipo, nombre, password: pass })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                document.getElementById("input-nombre-jugador").value = "";
+                await cargarJugadores();
+                mostrarMensaje("✅ Jugador agregado con éxito");
+            } else {
+                mostrarMensaje("❌ Error: " + data.error, true);
+            }
+        } catch (err) {
+            mostrarMensaje("❌ Error de conexión", true);
         }
-    } catch (err) {
-        alert("❌ Error de conexión");
-    }
+    });
 }
 
 async function eliminarJugador(id) {
-    const pass = prompt("Clave Admin:");
-    if (!pass) return;
-
-    try {
-        const res = await fetch(`/jugadores/${id}`, {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ password: pass })
-        });
-        const data = await res.json();
-        if (res.ok) {
-            await cargarJugadores();
-        } else {
-            alert("❌ Error: " + data.error);
+    pedirClave("Clave Admin", async (pass) => {
+        try {
+            const res = await fetch(`/jugadores/${id}`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ password: pass })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                await cargarJugadores();
+                mostrarMensaje("✅ Jugador eliminado");
+            } else {
+                mostrarMensaje("❌ Error: " + data.error, true);
+            }
+        } catch (err) {
+            mostrarMensaje("❌ Error de conexión", true);
         }
-    } catch (err) {
-        alert("❌ Error de conexión");
-    }
+    });
 }
 
 init();

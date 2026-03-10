@@ -102,6 +102,27 @@
     </div>
   </div>
 
+  <!-- MODAL CLAVE -->
+<div id="modal-clave" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;padding:30px;width:320px;box-shadow:0 8px 30px rgba(0,0,0,0.3);border-top:4px solid #1A4F9C;">
+    <h3 id="modal-clave-titulo" style="margin:0 0 15px;color:#1A4F9C;font-size:1rem;text-align:center;"></h3>
+    <input id="modal-clave-input" type="password" placeholder="Ingresá la clave" 
+           style="width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;font-size:1rem;box-sizing:border-box;outline:none;"/>
+    <div style="display:flex;gap:10px;margin-top:15px;">
+      <button onclick="cerrarModalClave()" style="flex:1;padding:10px;border:2px solid #ccc;background:#fff;border-radius:8px;cursor:pointer;font-size:0.95rem;">Cancelar</button>
+      <button id="modal-clave-confirmar" style="flex:1;padding:10px;background:#1A4F9C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.95rem;font-weight:bold;">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MENSAJE -->
+<div id="modal-mensaje" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;">
+  <div class="modal-mensaje-box" style="background:#fff;border-radius:12px;padding:30px;width:300px;box-shadow:0 8px 30px rgba(0,0,0,0.3);text-align:center;">
+    <p id="modal-mensaje-texto" style="margin:0 0 20px;font-size:1rem;color:#333;"></p>
+    <button onclick="cerrarModalMensaje()" style="padding:10px 30px;background:#1A4F9C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.95rem;font-weight:bold;">OK</button>
+  </div>
+</div>
+
   <script src="script.js"></script>
 </body>
 </html>
