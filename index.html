@@ -14,9 +14,7 @@
     <div class="tabs">
       <button id="tab-tabla" class="tab active" onclick="showTab('tabla')">Tabla</button>
       <button id="tab-fixture" class="tab" onclick="showTab('fixture')">Fixture</button>
-      <button id="tab-goleadores" class="tab" onclick="showTab('goleadores')">Goleadores</button>
       <button id="tab-proxima" class="tab" onclick="showTab('proxima')">Próxima Fecha</button>
-      <button id="tab-jugadores" class="tab" onclick="showTab('jugadores')">Jugadores</button>
     </div>
 
     <div id="tabla" class="seccion">
@@ -38,38 +36,6 @@
       <div id="fixture-container"></div>
     </div>
 
-    <div id="goleadores" class="seccion" style="display:none">
-      <h2>Tabla de Goleadores</h2>
-      <div class="table-container">
-        <table id="tabla-goleadores">
-          <thead>
-            <tr>
-              <th>#</th><th>Jugador</th><th>Equipo</th><th>Goles</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div id="jugadores" class="seccion" style="display:none">
-      <h2>Jugadores</h2>
-      <div class="jugadores-form">
-        <select id="select-equipo">
-          <option value="">Seleccioná un equipo</option>
-          <option>Dealers</option>
-          <option>Aston Birra</option>
-          <option>Kaiser</option>
-          <option>Caranchos</option>
-          <option>Magos</option>
-          <option>Golosos</option>
-        </select>
-        <input id="input-nombre-jugador" type="text" placeholder="Nombre del jugador">
-        <button class="btn-guardar" onclick="agregarJugador()">Agregar</button>
-      </div>
-      <div id="lista-jugadores"></div>
-    </div>
-
     <div id="proxima" class="seccion" style="display:none">
       <h2>Próxima Fecha</h2>
       <div id="proxima-container"></div>
@@ -85,8 +51,6 @@
         <span>-</span>
         <input id="input-away" type="number" min="0">
       </div>
-      <div id="goleadores-home" class="goleadores-seccion"></div>
-      <div id="goleadores-away" class="goleadores-seccion"></div>
       <div class="modal-botones">
         <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
         <button class="btn-guardar" onclick="guardarResultado()">Guardar</button>
@@ -103,25 +67,25 @@
   </div>
 
   <!-- MODAL CLAVE -->
-<div id="modal-clave" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;">
-  <div style="background:#fff;border-radius:12px;padding:30px;width:320px;box-shadow:0 8px 30px rgba(0,0,0,0.3);border-top:4px solid #1A4F9C;">
-    <h3 id="modal-clave-titulo" style="margin:0 0 15px;color:#1A4F9C;font-size:1rem;text-align:center;"></h3>
-    <input id="modal-clave-input" type="password" placeholder="Ingresá la clave" 
-           style="width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;font-size:1rem;box-sizing:border-box;outline:none;"/>
-    <div style="display:flex;gap:10px;margin-top:15px;">
-      <button onclick="cerrarModalClave()" style="flex:1;padding:10px;border:2px solid #ccc;background:#fff;border-radius:8px;cursor:pointer;font-size:0.95rem;">Cancelar</button>
-      <button id="modal-clave-confirmar" style="flex:1;padding:10px;background:#1A4F9C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.95rem;font-weight:bold;">OK</button>
+  <div id="modal-clave" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:12px;padding:30px;width:320px;box-shadow:0 8px 30px rgba(0,0,0,0.3);border-top:4px solid #1A4F9C;">
+      <h3 id="modal-clave-titulo" style="margin:0 0 15px;color:#1A4F9C;font-size:1rem;text-align:center;"></h3>
+      <input id="modal-clave-input" type="password" placeholder="Ingresá la clave" 
+             style="width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;font-size:1rem;box-sizing:border-box;outline:none;"/>
+      <div style="display:flex;gap:10px;margin-top:15px;">
+        <button onclick="cerrarModalClave()" style="flex:1;padding:10px;border:2px solid #ccc;background:#fff;border-radius:8px;cursor:pointer;font-size:0.95rem;">Cancelar</button>
+        <button id="modal-clave-confirmar" style="flex:1;padding:10px;background:#1A4F9C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.95rem;font-weight:bold;">OK</button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- MODAL MENSAJE -->
-<div id="modal-mensaje" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;">
-  <div class="modal-mensaje-box" style="background:#fff;border-radius:12px;padding:30px;width:300px;box-shadow:0 8px 30px rgba(0,0,0,0.3);text-align:center;">
-    <p id="modal-mensaje-texto" style="margin:0 0 20px;font-size:1rem;color:#333;"></p>
-    <button onclick="cerrarModalMensaje()" style="padding:10px 30px;background:#1A4F9C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.95rem;font-weight:bold;">OK</button>
+  <!-- MODAL MENSAJE -->
+  <div id="modal-mensaje" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;">
+    <div class="modal-mensaje-box" style="background:#fff;border-radius:12px;padding:30px;width:300px;box-shadow:0 8px 30px rgba(0,0,0,0.3);text-align:center;">
+      <p id="modal-mensaje-texto" style="margin:0 0 20px;font-size:1rem;color:#333;"></p>
+      <button onclick="cerrarModalMensaje()" style="padding:10px 30px;background:#1A4F9C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.95rem;font-weight:bold;">OK</button>
+    </div>
   </div>
-</div>
 
   <script src="script.js"></script>
 </body>

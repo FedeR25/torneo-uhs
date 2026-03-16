@@ -128,95 +128,6 @@ app.get("/tabla", async (req, res) => {
   }
 });
 
-app.get("/jugadores/:equipo", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM jugadores WHERE equipo = $1 ORDER BY nombre ASC",
-      [req.params.equipo]
-    )
-    res.json(result.rows)
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-app.get("/jugadores", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM jugadores ORDER BY equipo ASC, nombre ASC"
-    )
-    res.json(result.rows)
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-app.post("/jugadores", async (req, res) => {
-  const { equipo, nombre, password } = req.body
-  if (password !== process.env.CAPTAIN_PASSWORD) {
-    await log("CLAVE_INCORRECTA", `Intento fallido en /jugadores`)
-    return res.status(401).json({ error: "Clave incorrecta" })
-  }
-  try {
-    await pool.query(
-      "INSERT INTO jugadores (equipo, nombre) VALUES ($1, $2)",
-      [equipo, nombre]
-    )
-    await log("JUGADOR_AGREGADO", `${nombre} (${equipo})`)
-    res.json({ ok: true })
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-app.delete("/jugadores/:id", async (req, res) => {
-  const { password } = req.body
-  if (password !== process.env.ADMIN_PASSWORD) {
-    await log("CLAVE_INCORRECTA", `Intento fallido en /jugadores DELETE`)
-    return res.status(401).json({ error: "Clave incorrecta" })
-  }
-  try {
-    await pool.query("DELETE FROM jugadores WHERE id = $1", [req.params.id])
-    await log("JUGADOR_ELIMINADO", `ID: ${req.params.id}`)
-    res.json({ ok: true })
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-app.post("/goles", async (req, res) => {
-  const { partido_id, goles } = req.body
-  try {
-    await pool.query("DELETE FROM goles WHERE partido_id = $1", [partido_id])
-    for (const g of goles) {
-      if (g.cantidad > 0) {
-        await pool.query(
-          "INSERT INTO goles (partido_id, jugador_id, cantidad) VALUES ($1, $2, $3)",
-          [partido_id, g.jugador_id, g.cantidad]
-        )
-      }
-    }
-    res.json({ ok: true })
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-app.get("/goleadores", async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT j.nombre, j.equipo, SUM(g.cantidad) as total
-      FROM goles g
-      JOIN jugadores j ON j.id = g.jugador_id
-      GROUP BY j.nombre, j.equipo
-      ORDER BY total DESC
-    `)
-    res.json(result.rows)
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
 app.get("/proxima-fecha", async (req, res) => {
   try {
     const result = await pool.query(`
@@ -240,22 +151,6 @@ app.get("/admin/logs", async (req, res) => {
     const result = await pool.query(
       "SELECT * FROM logs ORDER BY fecha_hora DESC LIMIT 100"
     )
-    res.json(result.rows)
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-app.get("/goleadores/:equipo", async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT j.nombre, SUM(g.cantidad) as total
-      FROM goles g
-      JOIN jugadores j ON j.id = g.jugador_id
-      WHERE j.equipo = $1
-      GROUP BY j.nombre
-      ORDER BY total DESC
-    `, [req.params.equipo])
     res.json(result.rows)
   } catch (err) {
     res.status(500).json({ error: err.message })
